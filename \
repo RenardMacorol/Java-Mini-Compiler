@@ -1,0 +1,89 @@
+package gui.mini.compiler.Compiler;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Lexer {
+    String input;
+    List<Token> tokens = new ArrayList<>();
+    int currBuff = 0;
+    char currChar;
+
+    public Lexer(String input) {
+        this.input = input;
+        inputReader();
+    }
+
+    private void reader() {
+        currBuff++;
+    }
+
+    private void inputReader() {
+        while (currBuff <= input.length() - 1) {
+            Token newToken;
+            currChar = input.charAt(currBuff);
+            System.out.println(currChar);
+            if (Character.isWhitespace(currChar)) {
+                reader();
+            }
+            if (Character.isLetter(currChar)) {
+                tokens.add(newToken = inspectLetter());
+            }
+            if (Character.isDigit(currChar)) {
+                newToken = inspectNumber();
+                tokens.add(newToken);
+            }
+
+            reader();
+        }
+        reader();
+    }
+
+    private Token inspectLetter() {
+        StringBuilder word = new StringBuilder();
+        while (Character.isLetter(currChar) && currBuff <= input.length() - 1) {
+            currChar = input.charAt(currBuff);
+            System.out.print(currChar);
+            word.append(currChar);
+            reader();
+        }
+        return tokenGenerator(word.toString());
+    }
+
+    private Token tokenGenerator(String word) {
+        switch (word) {
+            case "int":
+                return new Token(Tokentype.INT, word);
+            case "float":
+                return new Token(Tokentype.FLOAT, word);
+            case "double":
+                return new Token(Tokentype.DOUBLE, word);
+            case "String":
+                return new Token(Tokentype.STRING, word);
+            case "char":
+                return new Token(Tokentype.CHAR, word);
+            case "boolean":
+                return new Token(Tokentype.BOOLEAN, word);
+            default:
+                return new Token(Tokentype.IDENTIFIER, word);
+        }
+
+    }
+
+    private Token inspectNumber() {
+
+        currChar = input.charAt(currBuff);
+        StringBuilder number = new StringBuilder();
+        while (Character.isLetter(currChar)) {
+            number.append(currChar);
+            reader();
+        }
+
+        return new Token(Tokentype.NUM_VAL, number.toString());
+    }
+
+    public List<Token> getTokens() {
+        return tokens;
+    }
+
+}
