@@ -3,21 +3,27 @@
  */
 package gui.mini.compiler;
 
+import gui.mini.compiler.Compiler.*;
 import java.util.List;
-
-import gui.mini.compiler.Compiler.Lexer;
-import gui.mini.compiler.Compiler.Token;
 
 public class App {
     public static void main(String[] args) {
-        String exampleInput = "int number = 1; float flnumber = 1.80;  char ch = '2' ; String ch = 'Name';";
-        System.out.println(exampleInput);
-        Lexer lexer = new Lexer(exampleInput);
-        List<Token> tokens = lexer.getTokens();
+        // INT, STRING_TYPE, CHAR, DOUBLE, FLOAT, BOOLEAN,
+        String input = "int x = 0; \n" +
+                "char gender = 'Renard';" +
+                "String name = \"Renard\";" +
+                "double y = 1.03;\n" +
+                "float xy = 1.03f;\n" +
+                "boolean istrue = true;\n";
+        System.out.println(input);
+        Lexer lexer = new Lexer(input);
+        List<Token> token = lexer.getTokens();
 
-        for (Token token : tokens) {
-            System.out.println(token.toString());
+        for (Token tokens : token) {
+            System.out.println(tokens.toString());
+
         }
-        // MainUI mainUI = new MainUI();
+
     }
+
 }

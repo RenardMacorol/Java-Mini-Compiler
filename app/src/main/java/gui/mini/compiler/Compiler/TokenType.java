@@ -1,17 +1,17 @@
 package gui.mini.compiler.Compiler;
 
-enum Tokentype {
-    INT,
-    FLOAT,
-    DOUBLE,
-    BOOLEAN,
-    CHAR,
-    STRING,
-    NUM_VAL,
-    IDENTIFIER,
-    ASSIGN_OP,
-    S_QOUTE,
-    D_QOUTE,
-    DOT,
-    DELIMITER,
+enum TokenType {
+    // Single Character Tokens
+    SEMICOLON, DOT, COMMA,
+    ADD, SUB, MUL, DIV, ASSIGN_OP,
+
+    // Literal
+    INDENTIFIER, STRING, NUMBER,
+
+    // Base Type
+    INT, STRING_TYPE, CHAR, FLOAT, DOUBLE, BOOLEAN,
+
+    // End of the file
+    EOF
+
 }

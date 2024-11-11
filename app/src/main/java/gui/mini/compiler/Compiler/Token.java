@@ -1,16 +1,17 @@
 package gui.mini.compiler.Compiler;
 
 public class Token {
-    Tokentype tokentype;
-    String lexeme;
+    final TokenType tokenType;
+    final String lexeme;
 
-    Token(Tokentype tokenType, String lexeme) {
-        this.tokentype = tokenType;
+    Token(TokenType tokenType, String lexeme) {
+        this.tokenType = tokenType;
         this.lexeme = lexeme;
     }
 
     @Override
     public String toString() {
-        return ("Token Type: " + tokentype + " Value: " + lexeme);
+        return "Type: " + tokenType + " Lexeme: " + lexeme;
     }
+
 }
