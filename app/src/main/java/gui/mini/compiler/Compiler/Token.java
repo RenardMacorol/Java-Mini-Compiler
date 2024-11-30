@@ -9,6 +9,14 @@ public class Token {
         this.lexeme = lexeme;
     }
 
+    public TokenType getTokenType() {
+        return tokenType;
+    }
+
+    public String getLexeme() {
+        return lexeme;
+    }
+
     @Override
     public String toString() {
         return "Type: " + tokenType + " Lexeme: " + lexeme;

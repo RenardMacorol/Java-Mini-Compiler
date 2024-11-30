@@ -29,7 +29,7 @@ public class Lexer {
             scanToken();
         }
 
-        tokens.add(new Token(TokenType.EOF, "AOT"));
+        tokens.add(new Token(TokenType.EOF, "EOF"));
 
     }
 
@@ -74,6 +74,10 @@ public class Lexer {
             case '"':
                 string();
                 break;
+            case '\'':
+                charCheck();
+                break;
+
             case ' ':
             case '\r':
             case '\n':
@@ -88,6 +92,20 @@ public class Lexer {
                     System.out.println("Unexpected Character" + c);
                 }
         }
+
+    }
+
+    private void charCheck() {
+        while (peekCurrent() != '\'' && !isAtEnd()) {
+            advance();
+        }
+        if (isAtEnd()) {
+            System.out.println("Unterminated Char");
+        }
+        advance();
+
+        String value = input.substring(start + 1, current - 1);
+        tokens.add(new Token(TokenType.CHAR, value));
 
     }
 
@@ -121,7 +139,7 @@ public class Lexer {
                 break;
             case "char":
 
-                tokens.add(new Token(TokenType.CHAR, base));
+                tokens.add(new Token(TokenType.CHAR_TYPE, base));
                 break;
             case "double":
 

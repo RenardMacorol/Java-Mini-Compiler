@@ -4,13 +4,14 @@
 package gui.mini.compiler;
 
 import gui.mini.compiler.Compiler.*;
+
 import java.util.List;
 
 public class App {
     public static void main(String[] args) {
         // INT, STRING_TYPE, CHAR, DOUBLE, FLOAT, BOOLEAN,
         String input = "int x = 0; \n" +
-                "char gender = 'Renard';" +
+                "char gender = 'M';" +
                 "String name = \"Renard\";" +
                 "double y = 1.03;\n" +
                 "float xy = 1.03f;\n" +
@@ -24,6 +25,9 @@ public class App {
 
         }
 
+        Parser parser = new Parser(token);
+
+        parser.initParser();
     }
 
 }
