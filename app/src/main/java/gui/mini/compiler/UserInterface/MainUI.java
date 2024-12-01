@@ -1,105 +1,204 @@
 package gui.mini.compiler.UserInterface;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 
 public class MainUI {
-    private JFrame mainFrame;
-    private JPanel textPanel;
-    private JPanel buttonPanel;
-    private JButton openFileButton;
-    private JButton lexicalAnalysisButton;
-    private JButton syntaxAnalysisButton;
-    private JButton semanticAnalysisButton;
-    private JButton clearButton;
-    private JTextArea resultArea;
-    private JTextArea codeArea;
-    private int buttonWidth = 30;
-    private int buttonHeight = 30;
+    private JFrame mainFrame;         // Main application frame
+    private JPanel buttonPanel, textPanel; // Panels for buttons and text areas
+    private JButton openFileButton, lexicalAnalysisButton, syntaxAnalysisButton, semanticAnalysisButton, clearButton;
+    private JTextArea resultArea, codeArea; // Areas to display file content and analysis results
+    private JFileChooser fileChooser;       // File chooser dialog
+    private File openedFile;                // Currently selected file
 
     public MainUI() {
-        openUI();
+        openUI(); // Initialize and display the UI
     }
 
     private void openUI() {
-        mainFrame = new JFrame();
-        mainFrame.setSize(1024, 768);
-        mainFrame.setTitle("Java Mini-Compiler 1");
+        mainFrame = new JFrame("Final Project - Mini Compiler");
+        mainFrame.setSize(1024, 450);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setResizable(false);
-        mainFrame.setLocationRelativeTo(null);
-        mainFrame.setVisible(true);
+        mainFrame.setLayout(new BorderLayout());
+        mainFrame.setResizable(false); // Prevent resizing for consistent layout
+        mainFrame.setLocationRelativeTo(null); // Center the window on screen
 
+        // Initialize and add the two main panels
+        initializeButtonPanel();
+        initializeTextPanel();
+
+        // Set button states (disable some buttons initially)
+        setInitialButtonStates();
+
+        // Add panels to the frame
+        mainFrame.add(buttonPanel, BorderLayout.WEST);
+        mainFrame.add(textPanel, BorderLayout.CENTER);
+
+        mainFrame.setVisible(true); // Display the frame
+    }
+
+    /**
+     * Initializes the left panel with buttons
+     * All buttons are the same size and aligned vertically.
+     */
+    private void initializeButtonPanel() {
         buttonPanel = new JPanel();
-        buttonPanel.setBackground(Color.RED);
-        buttonPanel.setBounds(0, 0, 250, 1024);
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-        buttons();
+        buttonPanel.setLayout(new GridLayout(5, 1, 10, 10)); // 5 rows, 1 column, with gaps
+        buttonPanel.setPreferredSize(new Dimension(200, 768)); // Fixed width for the panel
+        buttonPanel.setBackground(new Color(102, 153, 102)); // Soft green background
 
-        textPanel = new JPanel();
-        textPanel.setBackground(Color.BLUE);
-        textPanel.setBounds(500, 0, 50, 1024);
-        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-        // textAreaPanel();
+        // Create buttons with consistent size
+        openFileButton = createButton("Open File");
+        lexicalAnalysisButton = createButton("Lexical Analysis");
+        syntaxAnalysisButton = createButton("Syntax Analysis");
+        semanticAnalysisButton = createButton("Semantic Analysis");
+        clearButton = createButton("Clear");
 
-        mainFrame.add(buttonPanel);
-        // mainFrame.add(textPanel);
-    }
+        // Set button actions
+        openFileButton.addActionListener(this::handleOpenFile);
+        lexicalAnalysisButton.addActionListener(this::handleLexicalAnalysis);
+        syntaxAnalysisButton.addActionListener(this::handleSyntaxAnalysis);
+        semanticAnalysisButton.addActionListener(this::handleSemanticAnalysis);
+        clearButton.addActionListener(this::handleClear);
 
-    private void textAreaPanel() {
-        resultArea = new JTextArea(20, 20);
-        resultArea.setLineWrap(true);
-        resultArea.setWrapStyleWord(true);
-        // codeArea = new JTextArea();
-        // codeArea.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        textPanel.add(resultArea);
-        // textPanel.add(codeArea);
-    }
-
-    private void buttons() {
-        openFileButton = new JButton();
-        openFileButton.setText("Open File");
-        openFileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        openFileButton.setSize(buttonWidth, buttonHeight);
-
-        lexicalAnalysisButton = new JButton();
-        lexicalAnalysisButton.setText("Lexical Analysis");
-        lexicalAnalysisButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lexicalAnalysisButton.setSize(buttonWidth, buttonHeight);
-
-        syntaxAnalysisButton = new JButton();
-        syntaxAnalysisButton.setText("Syntax Analysis");
-        syntaxAnalysisButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        syntaxAnalysisButton.setSize(buttonWidth, buttonHeight);
-
-        semanticAnalysisButton = new JButton();
-        semanticAnalysisButton.setText("Semantics Analysis");
-        semanticAnalysisButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        semanticAnalysisButton.setSize(buttonWidth, buttonHeight);
-
-        clearButton = new JButton();
-        clearButton.setText("Clear");
-        clearButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        clearButton.setSize(buttonWidth, buttonHeight);
-
-        buttonPanel.add(Box.createRigidArea(new Dimension(15, 30)));
+        // Add buttons to the panel
         buttonPanel.add(openFileButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(15, 15)));
         buttonPanel.add(lexicalAnalysisButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(15, 15)));
         buttonPanel.add(syntaxAnalysisButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(15, 15)));
         buttonPanel.add(semanticAnalysisButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(15, 15)));
         buttonPanel.add(clearButton);
     }
 
+    /**
+     * Initializes the main text panel
+     * This contains two text areas: one for the code and one for the analysis results.
+     */
+    private void initializeTextPanel() {
+        textPanel = new JPanel();
+        textPanel.setLayout(new BorderLayout());
+        textPanel.setBackground(new Color(230, 240, 230)); // Light greenish-gray background
+
+        // Code Text Area
+        codeArea = new JTextArea();
+        codeArea.setBorder(BorderFactory.createTitledBorder("Code"));
+        codeArea.setEditable(false);
+        codeArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        codeArea.setBackground(new Color(245, 255, 245)); // Very light green background
+        JScrollPane codeScrollPane = new JScrollPane(codeArea);
+
+        // Result Text Area
+        resultArea = new JTextArea();
+        resultArea.setBorder(BorderFactory.createTitledBorder("Result"));
+        resultArea.setEditable(false);
+        resultArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        resultArea.setBackground(new Color(245, 255, 245)); // Very light green background
+        JScrollPane resultScrollPane = new JScrollPane(resultArea);
+
+        // Split panel to divide the two text areas
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, codeScrollPane, resultScrollPane);
+        splitPane.setDividerLocation(100); // Set the initial divider position
+
+        textPanel.add(splitPane, BorderLayout.CENTER); // Add split pane to the text panel
+    }
+
+    /**
+     * Creates a button with consistent styling and size
+     */
+    private JButton createButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setBackground(new Color(192, 255, 192)); // Light green background
+        button.setForeground(Color.BLACK);
+
+        // Add hover effect for visual feedback
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(153, 255, 153)); // Darker green
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(192, 255, 192)); // Original color
+            }
+        });
+        return button;
+    }
+
+    /**
+     * Disables buttons that should not be used initially
+     */
+    private void setInitialButtonStates() {
+        lexicalAnalysisButton.setEnabled(false);
+        syntaxAnalysisButton.setEnabled(false);
+        semanticAnalysisButton.setEnabled(false);
+    }
+
+    /**
+     * Opens a file and displays its contents in the Code Text Area
+     */
+    private void handleOpenFile(ActionEvent e) {
+        fileChooser = new JFileChooser();
+        int returnValue = fileChooser.showOpenDialog(mainFrame);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            openedFile = fileChooser.getSelectedFile();
+            displayFileContents();
+            lexicalAnalysisButton.setEnabled(true); // Enable Lexical Analysis button
+        }
+    }
+
+    /**
+     * Displays the contents of the selected file in the Code Text Area
+     */
+    private void displayFileContents() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(openedFile))) {
+            codeArea.setText(""); // Clear previous contents
+            String line;
+            while ((line = reader.readLine()) != null) {
+                codeArea.append(line + "\n"); // Append each line
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(mainFrame, "Error reading file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Handles Lexical Analysis
+     */
+    private void handleLexicalAnalysis(ActionEvent e) {
+        resultArea.append("Performing Lexical Analysis...\n");
+        lexicalAnalysisButton.setEnabled(false); // Disable current button
+        syntaxAnalysisButton.setEnabled(true);  // Enable next button
+    }
+
+    /**
+     * Handles Syntax Analysis
+     */
+    private void handleSyntaxAnalysis(ActionEvent e) {
+        resultArea.append("Performing Syntax Analysis...\n");
+        syntaxAnalysisButton.setEnabled(false); // Disable current button
+        semanticAnalysisButton.setEnabled(true); // Enable next button
+    }
+
+    /**
+     * Handles Semantic Analysis
+     */
+    private void handleSemanticAnalysis(ActionEvent e) {
+        resultArea.append("Performing Semantic Analysis...\n");
+        semanticAnalysisButton.setEnabled(false); // Disable current button
+    }
+
+    /**
+     * Clears all areas and resets button states
+     */
+    private void handleClear(ActionEvent e) {
+        codeArea.setText(""); // Clear code area
+        resultArea.setText(""); // Clear result area
+        setInitialButtonStates(); // Reset button states
+    }
 }
