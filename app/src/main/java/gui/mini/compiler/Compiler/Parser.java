@@ -1,81 +1,125 @@
 package gui.mini.compiler.Compiler;
 
-import java.util.*;
+import java.util.List;
 
 public class Parser {
-    List<Token> tokens;
-    int position;
-    TokenType currentToken;
+    private List<Token> tokens;
+    private int position;
+    private StringBuilder results; // Collect results for output
 
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
         this.position = 0;
+        this.results = new StringBuilder();
     }
 
-    public void consume() {
-        position++;
+    // Public method to return results
+    public String getResults() {
+        return results.toString();
     }
 
+    // Start parsing process
     public void initParser() {
-        forType();
-
+        results.append("Starting Syntax Analysis...\n");
+        while (position < tokens.size()) {
+            if (tokens.get(position).getTokenType() == TokenType.EOF) {
+                results.append("End of File Reached.\n");
+                break;
+            }
+            parseStatement();
+        }
+        results.append("Syntax Analysis Completed.\n");
     }
 
-    void forType() {
-        if (tokens.get(position).getTokenType() == TokenType.EOF) {
-            System.out.println("End");
+    // Parse a full statement
+    private void parseStatement() {
+        if (isDataType()) {
+            parseDeclaration();
+        } else {
+            error("Expected a data type but found: " + currentToken());
         }
-        currentToken = tokens.get(position).getTokenType();
-        if (currentToken == TokenType.CHAR_TYPE || currentToken == TokenType.STRING_TYPE
-                || currentToken == TokenType.FLOAT || currentToken == TokenType.DOUBLE
-                || currentToken == TokenType.BOOLEAN || currentToken == TokenType.INT) {
-            System.out.println("Passed" + currentToken);
-            consume();
-            forType();
-        }
-        forIdent();
-
     }
 
-    void forIdent() {
-        if (currentToken == TokenType.INDENTIFIER) {
+    // Parse a declaration (e.g., "int x = 10;")
+    private void parseDeclaration() {
+        consume(); // Consume the data type
+        if (isIdentifier()) {
+            results.append("Passed: Identifier (").append(currentToken()).append(")\n");
+            consume(); // Consume the identifier
 
-            System.out.println("Passed" + currentToken);
-            consume();
-            forType();
+            if (isAssignOperator()) {
+                results.append("Passed: Assignment Operator (").append(currentToken()).append(")\n");
+                consume(); // Consume the assignment operator
+
+                parseValue(); // Parse the value assigned
+            }
+
+            if (isSemicolon()) {
+                results.append("Passed: Semicolon\n");
+                consume(); // Consume the semicolon
+            } else {
+                error("Expected a semicolon but found: " + currentToken());
+            }
+        } else {
+            error("Expected an identifier but found: " + currentToken());
         }
-        forAssignOP();
-
     }
 
-    void forAssignOP() {
-        if (currentToken == TokenType.ASSIGN_OP) {
-
-            System.out.println("Passed" + currentToken);
+    // Parse a value (e.g., a number, string, or character)
+    private void parseValue() {
+        if (isValue()) {
+            results.append("Passed: Value (").append(currentToken()).append(")\n");
             consume();
-            forType();
+        } else {
+            error("Expected a value but found: " + currentToken());
         }
-
-        forVal();
     }
 
-    void forVal() {
-        if (currentToken == TokenType.NUMBER || currentToken == TokenType.STRING || currentToken == TokenType.CHAR) {
-            System.out.println("Passed" + currentToken);
-            consume();
-            forType();
-        }
-        forDeli();
-
+    // Utility Methods
+    private boolean isDataType() {
+        return match(TokenType.INT, TokenType.FLOAT, TokenType.DOUBLE, TokenType.CHAR_TYPE,
+                TokenType.STRING_TYPE, TokenType.BOOLEAN);
     }
 
-    void forDeli() {
+    private boolean isIdentifier() {
+        return match(TokenType.INDENTIFIER);
+    }
 
-        if (currentToken == TokenType.SEMICOLON || currentToken == TokenType.INDENTIFIER) {
-            System.out.println("Passed" + currentToken);
-            consume();
-            forType();
+    private boolean isAssignOperator() {
+        return match(TokenType.ASSIGN_OP);
+    }
+
+    private boolean isValue() {
+        return match(TokenType.NUMBER, TokenType.STRING, TokenType.CHAR, TokenType.BOOLEAN_LITERAL); // Added to support boolean values
+    }
+
+    private boolean isSemicolon() {
+        return match(TokenType.SEMICOLON);
+    }
+
+    private boolean match(TokenType... types) {
+        if (position < tokens.size()) {
+            for (TokenType type : types) {
+                if (tokens.get(position).getTokenType() == type) {
+                    return true;
+                }
+            }
         }
+        return false;
+    }
 
+    private TokenType currentToken() {
+        return position < tokens.size() ? tokens.get(position).getTokenType() : null;
+    }
+
+    private void consume() {
+        if (position < tokens.size()) {
+            position++;
+        }
+    }
+
+    private void error(String message) {
+        results.append("Syntax Error: ").append(message).append("\n");
+        position++; // Skip the problematic token to attempt recovery
     }
 }
