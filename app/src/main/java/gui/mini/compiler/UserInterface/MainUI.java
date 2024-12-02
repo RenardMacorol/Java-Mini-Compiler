@@ -1,7 +1,16 @@
 package gui.mini.compiler.UserInterface;
 
+import gui.mini.compiler.Compiler.Lexer;
+import gui.mini.compiler.Compiler.Token;
+import gui.mini.compiler.Compiler.Parser;
+import gui.mini.compiler.Compiler.TokenType;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -14,7 +23,11 @@ public class MainUI {
     private JButton openFileButton, lexicalAnalysisButton, syntaxAnalysisButton, semanticAnalysisButton, clearButton;
     private JTextArea resultArea, codeArea; // Areas to display file content and analysis results
     private JFileChooser fileChooser;       // File chooser dialog
-    private File openedFile;                // Currently selected file
+    private File openedFile;
+
+    private Lexer lexer;
+    private Parser parser;
+    // Currently selected file
 
     public MainUI() {
         openUI(); // Initialize and display the UI
@@ -22,7 +35,7 @@ public class MainUI {
 
     private void openUI() {
         mainFrame = new JFrame("Final Project - Mini Compiler");
-        mainFrame.setSize(1024, 450);
+        mainFrame.setSize(1024, 600);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setLayout(new BorderLayout());
         mainFrame.setResizable(false); // Prevent resizing for consistent layout
@@ -170,19 +183,45 @@ public class MainUI {
     /**
      * Handles Lexical Analysis
      */
+
+
     private void handleLexicalAnalysis(ActionEvent e) {
-        resultArea.append("Performing Lexical Analysis...\n");
-        lexicalAnalysisButton.setEnabled(false); // Disable current button
-        syntaxAnalysisButton.setEnabled(true);  // Enable next button
+        try {
+            String inputCode = codeArea.getText(); // Get code from codeArea
+            lexer = new Lexer(inputCode); // Perform lexical analysis
+            List<Token> tokens = lexer.getTokens();
+
+            resultArea.setText("Lexical Analysis Completed:\n");
+            for (Token token : tokens) {
+                resultArea.append(token.toString() + "\n");
+            }
+
+            lexicalAnalysisButton.setEnabled(false);
+            syntaxAnalysisButton.setEnabled(true); // Enable Syntax Analysis button
+        } catch (Exception ex) {
+            resultArea.append("Error during Lexical Analysis: " + ex.getMessage() + "\n");
+        }
     }
 
-    /**
-     * Handles Syntax Analysis
-     */
     private void handleSyntaxAnalysis(ActionEvent e) {
-        resultArea.append("Performing Syntax Analysis...\n");
-        syntaxAnalysisButton.setEnabled(false); // Disable current button
-        semanticAnalysisButton.setEnabled(true); // Enable next button
+        try {
+            if (lexer == null) {
+                resultArea.append("Error: Perform Lexical Analysis first.\n");
+                return;
+            }
+
+            List<Token> tokens = lexer.getTokens(); // Get tokens from Lexer
+            parser = new Parser(tokens); // Perform syntax analysis
+            resultArea.append("Syntax Analysis:\n");
+            parser.initParser();
+
+            resultArea.append(parser.getResults()); // Added to append results
+
+            syntaxAnalysisButton.setEnabled(false);
+            semanticAnalysisButton.setEnabled(true); // Enable Semantic Analysis button
+        } catch (Exception ex) {
+            resultArea.append("Error during Syntax Analysis: " + ex.getMessage() + "\n");
+        }
     }
 
     /**
