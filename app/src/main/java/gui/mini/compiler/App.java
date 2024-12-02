@@ -32,5 +32,16 @@ public class App {
         // Perform Syntax Analysis
         Parser parser = new Parser(tokens);
         parser.initParser();
+
+        // Print results from the parser
+        System.out.println("\nSyntax Analysis Results:");
+        System.out.println(parser.getResults());
+
+        // Perform Semantic Analysis
+        System.out.println("\nPerforming Semantic Analysis...\n");
+        SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(tokens);
+        semanticAnalyzer.initSemanticAnalysis();
+        System.out.println(semanticAnalyzer.getResults());
+
     }
 }
