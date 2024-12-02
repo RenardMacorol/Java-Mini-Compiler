@@ -90,7 +90,7 @@ public class Parser {
     }
 
     private boolean isValue() {
-        return match(TokenType.NUMBER, TokenType.STRING, TokenType.CHAR, TokenType.BOOLEAN_LITERAL); // Added to support boolean values
+        return match(TokenType.NUMBER, TokenType.STRING, TokenType.CHAR, TokenType.BOOLEAN_LITERAL); 
     }
 
     private boolean isSemicolon() {
