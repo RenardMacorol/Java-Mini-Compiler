@@ -16,7 +16,6 @@ public class Lexer {
 
     public List<Token> getTokens() {
         return tokens;
-
     }
 
     private boolean isAtEnd() {
@@ -28,9 +27,7 @@ public class Lexer {
             start = current;
             scanToken();
         }
-
         tokens.add(new Token(TokenType.EOF, "EOF"));
-
     }
 
     private char advance() {
@@ -71,9 +68,11 @@ public class Lexer {
             case ',':
                 tokens.add(new Token(TokenType.COMMA, ","));
                 break;
+
             case '"':
                 string();
                 break;
+
             case '\'':
                 charCheck();
                 break;
@@ -82,17 +81,18 @@ public class Lexer {
             case '\r':
             case '\n':
             case '\t':
+                // Ignore whitespace
+                break;
+
             default:
                 if (isDigit(c)) {
                     number();
-
                 } else if (isLetter(c)) {
-                    letter();
+                    letterOrKeyword();
                 } else {
-                    System.out.println("Unexpected Character" + c);
+                    System.out.println("Unexpected Character: " + c);
                 }
         }
-
     }
 
     private void charCheck() {
@@ -103,10 +103,8 @@ public class Lexer {
             System.out.println("Unterminated Char");
         }
         advance();
-
         String value = input.substring(start + 1, current - 1);
         tokens.add(new Token(TokenType.CHAR, value));
-
     }
 
     private boolean isLetter(char c) {
@@ -117,76 +115,73 @@ public class Lexer {
         return c >= '0' && c <= '9';
     }
 
-    private boolean isDelimiter(char c) {
-        return c >= ';';
-    }
-
-    private void letter() {
-        while (isLetter(input.charAt(current)) && !isAtEnd()) {
+    private void letterOrKeyword() {
+        while ((isLetter(peekCurrent()) || isDigit(peekCurrent())) && !isAtEnd()) {
             advance();
         }
-        String base = input.substring(start, current);
-        // INT, STRING_TYPE, CHAR, DOUBLE, BOOLEAN,
-        switch (base) {
+        String lexeme = input.substring(start, current);
+
+        // Handle keywords, including boolean literals
+        switch (lexeme) {
             case "int":
-
-                tokens.add(new Token(TokenType.INT, base));
+                tokens.add(new Token(TokenType.INT, lexeme));
                 break;
-
             case "String":
-
-                tokens.add(new Token(TokenType.STRING_TYPE, base));
+                tokens.add(new Token(TokenType.STRING_TYPE, lexeme));
                 break;
             case "char":
-
-                tokens.add(new Token(TokenType.CHAR_TYPE, base));
+                tokens.add(new Token(TokenType.CHAR_TYPE, lexeme));
                 break;
             case "double":
-
-                tokens.add(new Token(TokenType.DOUBLE, base));
+                tokens.add(new Token(TokenType.DOUBLE, lexeme));
                 break;
             case "float":
-
-                tokens.add(new Token(TokenType.FLOAT, base));
+                tokens.add(new Token(TokenType.FLOAT, lexeme));
                 break;
-
             case "boolean":
-
-                tokens.add(new Token(TokenType.BOOLEAN, base));
+                tokens.add(new Token(TokenType.BOOLEAN, lexeme));
+                break;
+            case "true":
+            case "false":
+                tokens.add(new Token(TokenType.BOOLEAN_LITERAL, lexeme));
                 break;
             default:
-                tokens.add(new Token(TokenType.INDENTIFIER, base));
+                tokens.add(new Token(TokenType.INDENTIFIER, lexeme));
                 break;
-
         }
-
     }
 
     private void number() {
-        while (isDigit(peek()))
+        while (isDigit(peekCurrent())) {
             advance();
-        if (peek() == '.' || isDelimiter(peek()) || peek() == 'f') {
-            advance();
-
-            while (isDigit(peek()))
-                advance();
-
         }
 
-        tokens.add(new Token(TokenType.NUMBER, input.substring(start, current)));
-    }
+        // Handle decimal numbers
+        if (peekCurrent() == '.' && isDigit(peekNext())) {
+            advance(); // Consume '.'
 
-    private char peek() {
-        if (current + 1 >= input.length())
-            return '\0';
-        return input.charAt(current + 1);
+            while (isDigit(peekCurrent())) {
+                advance();
+            }
+        }
 
+        // Handle float suffix 'f' or 'F'
+        if (peekCurrent() == 'f' || peekCurrent() == 'F') {
+            advance();
+            tokens.add(new Token(TokenType.NUMBER, input.substring(start, current) + " (float)"));
+        } else {
+            tokens.add(new Token(TokenType.NUMBER, input.substring(start, current)));
+        }
     }
 
     private char peekCurrent() {
-        if (isAtEnd())
-            return '\0';
+        if (isAtEnd()) return '\0';
         return input.charAt(current);
+    }
+
+    private char peekNext() {
+        if (current + 1 >= input.length()) return '\0';
+        return input.charAt(current + 1);
     }
 
     private void string() {
@@ -197,7 +192,6 @@ public class Lexer {
             System.out.println("Unterminated String");
         }
         advance();
-
         String value = input.substring(start + 1, current - 1);
         tokens.add(new Token(TokenType.STRING, value));
     }
