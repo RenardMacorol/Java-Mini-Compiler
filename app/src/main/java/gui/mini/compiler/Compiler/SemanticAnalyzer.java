@@ -1,4 +1,4 @@
-package gui.mini.compiler.Compiler;
+package gui.mini.compiler.Compiler; // just connect it to MainUI and this is already finished!
 
 import java.util.List;
 
