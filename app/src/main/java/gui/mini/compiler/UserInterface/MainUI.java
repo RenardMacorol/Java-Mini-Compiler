@@ -4,6 +4,7 @@ import gui.mini.compiler.Compiler.Lexer;
 import gui.mini.compiler.Compiler.Token;
 import gui.mini.compiler.Compiler.Parser;
 import gui.mini.compiler.Compiler.TokenType;
+import gui.mini.compiler.Compiler.SemanticAnalyzer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -228,8 +229,28 @@ public class MainUI {
      * Handles Semantic Analysis
      */
     private void handleSemanticAnalysis(ActionEvent e) {
-        resultArea.append("Performing Semantic Analysis...\n");
-        semanticAnalysisButton.setEnabled(false); // Disable current button
+        try {
+            if (lexer == null) {
+                resultArea.append("Error: Perform Lexical Analysis first.\n");
+                return;
+            }
+
+            if (parser == null) {
+                resultArea.append("Error: Perform Syntax Analysis first.\n");
+                return;
+            }
+
+            List<Token> tokens = lexer.getTokens(); // Get tokens from Lexer
+            SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(tokens); // Initialize SemanticAnalyzer
+            semanticAnalyzer.initSemanticAnalysis(); // Perform Semantic Analysis
+
+            resultArea.append("Semantic Analysis Results:\n");
+            resultArea.append(semanticAnalyzer.getResults()); // Append Semantic Analysis results to resultArea
+
+            semanticAnalysisButton.setEnabled(false); // Disable current button
+        } catch (Exception ex) {
+            resultArea.append("Error during Semantic Analysis: " + ex.getMessage() + "\n");
+        }
     }
 
     /**
