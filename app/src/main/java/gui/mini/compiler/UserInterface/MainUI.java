@@ -150,11 +150,10 @@ public class MainUI {
      */
     private void setInitialButtonStates() {
 
-        lexicalAnalysisButton.setForeground(Color.BLACK);
-        syntaxAnalysisButton.setForeground(Color.BLACK);
-        semanticAnalysisButton.setForeground(Color.BLACK);
-        clearButton.setForeground(Color.BLACK);
-        openFileButton.setForeground(Color.BLACK);
+        // Returning Button
+        lexicalAnalysisButton.setUI(new MetalButtonUI());
+        syntaxAnalysisButton.setUI(new MetalButtonUI());
+        semanticAnalysisButton.setUI(new MetalButtonUI());
 
         lexicalAnalysisButton.setEnabled(false);
         syntaxAnalysisButton.setEnabled(false);
@@ -165,11 +164,35 @@ public class MainUI {
     /**
      * Disables buttons when Error Occurred
      */
-    private void setErrorCodeButtonState() {
+    private void setErrorCodeButtonState(int buttonIndex) {
         lexicalAnalysisButton.setEnabled(false);
         syntaxAnalysisButton.setEnabled(false);
         semanticAnalysisButton.setEnabled(false);
         openFileButton.setEnabled(false);
+
+        switch (buttonIndex) {
+            case 0 -> {
+                lexicalAnalysisButton.setUI(new MetalButtonUI() {
+                    protected Color getDisabledTextColor() {
+                        return Color.RED;
+                    }
+                });
+            }
+            case 1 -> {
+                syntaxAnalysisButton.setUI(new MetalButtonUI() {
+                    protected Color getDisabledTextColor() {
+                        return Color.RED;
+                    }
+                });
+            }
+            case 2 -> {
+                semanticAnalysisButton.setUI(new MetalButtonUI() {
+                    protected Color getDisabledTextColor() {
+                        return Color.RED;
+                    }
+                });
+            }
+        }
     }
 
     /**
@@ -245,12 +268,7 @@ public class MainUI {
             boolean parserError = parseResult.contains("Syntax Error:");
 
             if (parserError) {
-                syntaxAnalysisButton.setUI(new MetalButtonUI() {
-                    protected Color getDisabledTextColor() {
-                        return Color.RED;
-                    }
-                });
-                setErrorCodeButtonState();
+                setErrorCodeButtonState(1);
             }
             else {
                 syntaxAnalysisButton.setEnabled(false);
