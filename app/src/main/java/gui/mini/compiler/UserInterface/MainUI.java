@@ -7,6 +7,7 @@ import gui.mini.compiler.Compiler.TokenType;
 import gui.mini.compiler.Compiler.SemanticAnalyzer;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalButtonUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -148,9 +149,27 @@ public class MainUI {
      * Disables buttons that should not be used initially
      */
     private void setInitialButtonStates() {
+
+        lexicalAnalysisButton.setForeground(Color.BLACK);
+        syntaxAnalysisButton.setForeground(Color.BLACK);
+        semanticAnalysisButton.setForeground(Color.BLACK);
+        clearButton.setForeground(Color.BLACK);
+        openFileButton.setForeground(Color.BLACK);
+
         lexicalAnalysisButton.setEnabled(false);
         syntaxAnalysisButton.setEnabled(false);
         semanticAnalysisButton.setEnabled(false);
+        openFileButton.setEnabled(true);
+    }
+
+    /**
+     * Disables buttons when Error Occurred
+     */
+    private void setErrorCodeButtonState() {
+        lexicalAnalysisButton.setEnabled(false);
+        syntaxAnalysisButton.setEnabled(false);
+        semanticAnalysisButton.setEnabled(false);
+        openFileButton.setEnabled(false);
     }
 
     /**
@@ -216,10 +235,28 @@ public class MainUI {
             resultArea.append("Syntax Analysis:\n");
             parser.initParser();
 
-            resultArea.append(parser.getResults()); // Added to append results
+            String parseResult = parser.getResults();
+            resultArea.append(parseResult); // Added to append results
 
-            syntaxAnalysisButton.setEnabled(false);
-            semanticAnalysisButton.setEnabled(true); // Enable Semantic Analysis button
+            System.out.println("PARSEREMEMEME");
+
+            // detect if parser output an error
+
+            boolean parserError = parseResult.contains("Syntax Error:");
+
+            if (parserError) {
+                syntaxAnalysisButton.setUI(new MetalButtonUI() {
+                    protected Color getDisabledTextColor() {
+                        return Color.RED;
+                    }
+                });
+                setErrorCodeButtonState();
+            }
+            else {
+                syntaxAnalysisButton.setEnabled(false);
+                semanticAnalysisButton.setEnabled(true); // Enable Semantic Analysis button
+            }
+
         } catch (Exception ex) {
             resultArea.append("Error during Syntax Analysis: " + ex.getMessage() + "\n");
         }
