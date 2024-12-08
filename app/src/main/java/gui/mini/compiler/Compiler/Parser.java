@@ -78,7 +78,7 @@ public class Parser {
     // Utility Methods
     private boolean isDataType() {
         return match(TokenType.INT, TokenType.FLOAT, TokenType.DOUBLE, TokenType.CHAR_TYPE,
-                TokenType.STRING_TYPE, TokenType.BOOLEAN);
+                TokenType.STRING_TYPE, TokenType.BOOLEAN, TokenType.BYTE, TokenType.SHORT);
     }
 
     private boolean isIdentifier() {

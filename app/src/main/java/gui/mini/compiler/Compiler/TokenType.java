@@ -9,7 +9,7 @@ public enum TokenType {
     INDENTIFIER, STRING, NUMBER, CHAR, BOOLEAN_LITERAL,
 
     // Base Type
-    INT, STRING_TYPE, CHAR_TYPE, FLOAT, DOUBLE, BOOLEAN,
+    INT, STRING_TYPE, CHAR_TYPE, FLOAT, DOUBLE, BOOLEAN, BYTE, SHORT,
 
     // End of the file
     EOF

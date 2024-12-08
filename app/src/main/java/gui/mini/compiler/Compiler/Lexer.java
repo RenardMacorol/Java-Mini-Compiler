@@ -123,6 +123,12 @@ public class Lexer {
 
         // Handle keywords, including boolean literals
         switch (lexeme) {
+            case "byte":
+                tokens.add(new Token(TokenType.BYTE, lexeme));
+                break;
+            case "short":
+                tokens.add(new Token(TokenType.SHORT, lexeme));
+                break;
             case "int":
                 tokens.add(new Token(TokenType.INT, lexeme));
                 break;
