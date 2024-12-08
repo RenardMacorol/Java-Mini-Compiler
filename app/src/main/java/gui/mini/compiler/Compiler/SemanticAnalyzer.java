@@ -1,4 +1,4 @@
-package gui.mini.compiler.Compiler; // just connect it to MainUI and this is already finished!
+package gui.mini.compiler.Compiler;
 
 import java.util.List;
 
@@ -23,6 +23,7 @@ public class SemanticAnalyzer {
         results.append("Starting Semantic Analysis...\n");
         while (position < tokens.size()) {
             Token token = tokens.get(position);
+            System.out.println("Processing token: " + token); // Debugging statement
             if (token.getTokenType() == TokenType.EOF) {
                 results.append("End of File Reached.\n");
                 break;
@@ -32,12 +33,14 @@ public class SemanticAnalyzer {
         results.append("Semantic Analysis Completed.\n");
     }
 
+
     // Analyze each statement
     private void analyzeStatement() {
         if (isDataType()) {
             analyzeDeclaration();
         } else {
             error("Expected a data type but found: " + currentToken());
+            consume();
         }
     }
 
@@ -79,6 +82,7 @@ public class SemanticAnalyzer {
         }
     }
 
+
     // Check if types are compatible
     private boolean isTypeCompatible(Token typeToken, Token valueToken) {
         switch (typeToken.getTokenType()) {
@@ -95,6 +99,10 @@ public class SemanticAnalyzer {
                 return valueToken.getTokenType() == TokenType.STRING;
             case BOOLEAN:
                 return valueToken.getTokenType() == TokenType.BOOLEAN_LITERAL;
+            case BYTE:
+                return valueToken.getTokenType() == TokenType.NUMBER;
+            case SHORT:
+                return valueToken.getTokenType() == TokenType.NUMBER;
             default:
                 return false;
         }
@@ -103,7 +111,7 @@ public class SemanticAnalyzer {
     // Utility Methods
     private boolean isDataType() {
         return match(TokenType.INT, TokenType.FLOAT, TokenType.DOUBLE, TokenType.CHAR_TYPE,
-                TokenType.STRING_TYPE, TokenType.BOOLEAN);
+                TokenType.STRING_TYPE, TokenType.BOOLEAN, TokenType.BYTE, TokenType.SHORT);
     }
 
     private boolean isIdentifier() {
