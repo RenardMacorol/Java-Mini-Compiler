@@ -20,11 +20,11 @@ import java.io.File;
 import java.io.FileReader;
 
 public class MainUI {
-    private JFrame mainFrame;         // Main application frame
+    private JFrame mainFrame; // Main application frame
     private JPanel buttonPanel, textPanel; // Panels for buttons and text areas
     private JButton openFileButton, lexicalAnalysisButton, syntaxAnalysisButton, semanticAnalysisButton, clearButton;
     private JTextArea resultArea, codeArea; // Areas to display file content and analysis results
-    private JFileChooser fileChooser;       // File chooser dialog
+    private JFileChooser fileChooser; // File chooser dialog
     private File openedFile;
 
     private Lexer lexer;
@@ -91,7 +91,8 @@ public class MainUI {
 
     /**
      * Initializes the main text panel
-     * This contains two text areas: one for the code and one for the analysis results.
+     * This contains two text areas: one for the code and one for the analysis
+     * results.
      */
     private void initializeTextPanel() {
         textPanel = new JPanel();
@@ -219,7 +220,8 @@ public class MainUI {
                 codeArea.append(line + "\n"); // Append each line
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(mainFrame, "Error reading file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(mainFrame, "Error reading file: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -227,12 +229,17 @@ public class MainUI {
      * Handles Lexical Analysis
      */
 
-
     private void handleLexicalAnalysis(ActionEvent e) {
         try {
             String inputCode = codeArea.getText(); // Get code from codeArea
             lexer = new Lexer(inputCode); // Perform lexical analysis
             List<Token> tokens = lexer.getTokens();
+            for (Token token : tokens) {
+                if (token.getTokenType() == TokenType.UNKOWN) {
+                    resultArea.setText("Error: Unkown Token " + token.getLexeme());
+                    return;
+                }
+            }
 
             resultArea.setText("Lexical Analysis Completed:\n");
             for (Token token : tokens) {
@@ -269,8 +276,7 @@ public class MainUI {
 
             if (parserError) {
                 setErrorCodeButtonState(1);
-            }
-            else {
+            } else {
                 syntaxAnalysisButton.setEnabled(false);
                 semanticAnalysisButton.setEnabled(true); // Enable Semantic Analysis button
             }
