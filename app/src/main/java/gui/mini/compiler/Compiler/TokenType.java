@@ -12,5 +12,5 @@ public enum TokenType {
     INT, STRING_TYPE, CHAR_TYPE, FLOAT, DOUBLE, BOOLEAN, BYTE, SHORT,
 
     // End of the file
-    EOF
+    EOF, UNKOWN
 }

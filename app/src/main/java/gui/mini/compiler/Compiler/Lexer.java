@@ -49,7 +49,8 @@ public class Lexer {
             case ',' -> addToken(TokenType.COMMA);
             case '"' -> string();
             case '\'' -> charCheck();
-            case ' ', '\r', '\t' -> {} // Ignore whitespace
+            case ' ', '\r', '\t' -> {
+            } // Ignore whitespace
             case '\n' -> line++; // Track line numbers
             default -> {
                 if (isDigit(c)) {
@@ -57,6 +58,7 @@ public class Lexer {
                 } else if (isLetter(c)) {
                     identifierOrKeyword();
                 } else {
+                    addToken(TokenType.UNKOWN, c + "");
                     System.err.println("Unexpected character '" + c + "' at line " + line);
                 }
             }
@@ -93,11 +95,13 @@ public class Lexer {
     }
 
     private void number() {
-        while (isDigit(peek())) advance();
+        while (isDigit(peek()))
+            advance();
 
         if (peek() == '.' && isDigit(peekNext())) {
             advance(); // Consume '.'
-            while (isDigit(peek())) advance();
+            while (isDigit(peek()))
+                advance();
         }
 
         if (peek() == 'f' || peek() == 'F') {
@@ -110,7 +114,8 @@ public class Lexer {
 
     private void string() {
         while (peek() != '"' && !isAtEnd()) {
-            if (peek() == '\n') line++;
+            if (peek() == '\n')
+                line++;
             advance();
         }
         if (isAtEnd()) {
@@ -136,8 +141,6 @@ public class Lexer {
         advance(); // Consume closing single quote
         addToken(TokenType.CHAR, "'" + value + "'");
     }
-
-
 
     private char peek() {
         return isAtEnd() ? '\0' : input.charAt(current);

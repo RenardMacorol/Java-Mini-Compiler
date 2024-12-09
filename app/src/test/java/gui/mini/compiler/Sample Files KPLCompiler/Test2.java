@@ -1,1 +1,1 @@
-integer x = 0;;
+integer @ = 0;;
