@@ -171,6 +171,12 @@ public class MainUI {
         semanticAnalysisButton.setEnabled(false);
         openFileButton.setEnabled(false);
 
+        /*
+        * Button Index:
+        * 0 = lexical
+        * 1 = syntax
+        * 2 = semantic
+        */
         switch (buttonIndex) {
             case 0 -> {
                 lexicalAnalysisButton.setUI(new MetalButtonUI() {
@@ -237,6 +243,7 @@ public class MainUI {
             for (Token token : tokens) {
                 if (token.getTokenType() == TokenType.UNKOWN) {
                     resultArea.setText("Error: Unkown Token " + token.getLexeme());
+                    setErrorCodeButtonState(0);
                     return;
                 }
             }
@@ -250,6 +257,7 @@ public class MainUI {
             syntaxAnalysisButton.setEnabled(true); // Enable Syntax Analysis button
         } catch (Exception ex) {
             resultArea.append("Error during Lexical Analysis: " + ex.getMessage() + "\n");
+            setErrorCodeButtonState(0);
         }
     }
 
@@ -268,8 +276,6 @@ public class MainUI {
             String parseResult = parser.getResults();
             resultArea.append(parseResult); // Added to append results
 
-            System.out.println("PARSEREMEMEME");
-
             // detect if parser output an error
 
             boolean parserError = parseResult.contains("Syntax Error:");
@@ -283,6 +289,7 @@ public class MainUI {
 
         } catch (Exception ex) {
             resultArea.append("Error during Syntax Analysis: " + ex.getMessage() + "\n");
+            setErrorCodeButtonState(1);
         }
     }
 
@@ -311,6 +318,7 @@ public class MainUI {
             semanticAnalysisButton.setEnabled(false); // Disable current button
         } catch (Exception ex) {
             resultArea.append("Error during Semantic Analysis: " + ex.getMessage() + "\n");
+            setErrorCodeButtonState(2);
         }
     }
 
